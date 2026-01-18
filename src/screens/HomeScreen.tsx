@@ -9,7 +9,9 @@ import {
   FlatList,
   Keyboard,
   Alert,
+  Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { Map, SearchBar, StopCard, RouteCard, BottomSheet, LoadingSpinner } from '../components';
@@ -29,6 +31,11 @@ interface HomeScreenProps {
 type PlanningStep = 'origin' | 'destination' | 'results';
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const triggerHaptic = () => {
+    if (Platform.OS === 'ios') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
   const [region, setRegion] = useState<MapRegion>(DEFAULT_LOCATION);
   const [allStops, setAllStops] = useState<Stop[]>([]);
   const [allPolylines, setAllPolylines] = useState<any[]>([]);
@@ -102,7 +109,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         const results = await searchStops(text);
         setFilteredStops(results);
       } catch (error) {
-        console.error('Error searching stops:', error);
+        // Silently handle search errors
+        setFilteredStops([]);
       }
     } else {
       setFilteredStops([]);
@@ -130,6 +138,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const handlePlanRoute = () => {
+    triggerHaptic();
     setIsPlanning(true);
     setPlanningStep('origin');
     setOriginStop(nearbyStop);
@@ -138,6 +147,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const handleRoutePress = (route: TravelRoute) => {
+    triggerHaptic();
     navigation.navigate('RouteDetail', { route });
   };
 

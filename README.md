@@ -1,122 +1,170 @@
 # Ñanduti Transit App
 
-A React Native/Expo mobile application for navigating public transit in Asunción, Paraguay. Built with Expo, React Native Maps, and Supabase.
+A modern React Native/Expo mobile application for navigating public transit in Asunción, Paraguay. Built with Expo, React Native Maps, and Supabase.
 
-## 🚀 Quick Start
+## 🚀 Features
 
-Get the app running in 5 minutes with our [Quick Start Guide](QUICKSTART.md).
+### Core Features
+- **Interactive Map**: View all bus stops (~120 stops) across Asunción
+- **Real-time Location**: Blue dot shows your current location
+- **Route Planning**: Find direct and transfer routes between any two stops
+- **Step-by-step Instructions**: Clear Spanish instructions for each journey
+- **Walking Directions**: Calculate walking distance and time to stops
+- **Transit Lines**: 15 bus lines with color-coded routes
+- **Visual Routes**: See routes highlighted on the map
+- **Smart Auto-fill**: Origin automatically filled with nearest stop
 
-## 📱 MVP Features
+### User Experience
+- **Loading States**: Clear indicators while data loads
+- **Error Handling**: Graceful error messages for failed requests
+- **Haptic Feedback**: Tactile feedback on button presses (iOS)
+- **Smooth Animations**: Fluid transitions and interactions
+- **Touch-Friendly**: All buttons meet 48x48dp touch target requirements
+- **Error Boundaries**: Prevents app crashes from unexpected errors
+- **Safe Area Support**: Proper spacing for notches and status bars
 
-The MVP includes all core features for transit navigation:
+## 📱 Screenshots
 
-- ✅ Interactive map with user location (blue dot)
-- ✅ All bus stops in Asunción (~120 stops)
-- ✅ 15 transit lines with route colors
-- ✅ Route planning with direct routes
-- ✅ Route planning with transfer routes
-- ✅ Step-by-step instructions in Spanish
-- ✅ Walking distance calculations
-- ✅ Loading and error states
-- ✅ Full TypeScript support
+### Home Screen
+- Interactive map centered on user location
+- Red markers showing all bus stops
+- Transit route lines displayed as dashed gray lines
+- "Planificar Ruta" (Plan Route) floating action button
+- Stop details bottom sheet when tapping markers
 
-## Tech Stack
+### Route Planning
+- Modal with origin/destination selection
+- Origin auto-filled with nearest stop
+- Search autocomplete for finding stops
+- Route results showing direct and transfer options
+- Duration, distance, and steps for each route
+
+### Route Detail
+- Map with highlighted route path
+- Route summary (duration, distance, type)
+- Step-by-step instructions in Spanish
+- Walking, bus, and transfer indicators
+- "Entendido" (Understood) button to return
+
+## 🛠 Tech Stack
 
 ### Core
-- **React Native** - Mobile framework
-- **Expo** - Development platform
-- **TypeScript** - Type safety
+- **React Native 0.73.2** - Mobile framework
+- **Expo 50.0.0** - Development platform and tooling
+- **TypeScript 5.1.3** - Type safety (strict mode enabled)
 
 ### Navigation
-- **React Navigation** - Screen navigation (Stack Navigator)
+- **React Navigation 6.1.9** - Screen navigation
+- **Stack Navigator** - Hierarchical navigation
 
 ### Maps & Location
-- **React Native Maps** - Map display
-- **Expo Location** - Device location services
+- **React Native Maps 1.10.0** - Interactive map display
+- **Expo Location 16.1.0** - Device location services
+- **Expo Haptics** - Tactile feedback support
 
 ### Backend
-- **Supabase** - Database and API
+- **Supabase 2.38.5** - Database and API
 - **PostgreSQL** - Transit data storage
 
 ### UI Components
-- **React Native Bottom Sheet** - Modal components
-- **React Native Gesture Handler** - Gesture handling
-- **React Native Reanimated** - Smooth animations
+- **React Native Gesture Handler 2.14.0** - Gesture handling
+- **React Native Reanimated 3.6.0** - Smooth animations
+- **React Native Safe Area Context 4.8.2** - Safe area handling
+- **@gorhom/bottom-sheet 4.6.0** - Modal components
 
-## Documentation
+## 🚦 Quick Start
 
-- **[Quick Start Guide](QUICKSTART.md)** - Get up and running in 5 minutes
-- **[MVP Setup Guide](docs/MVP_SETUP.md)** - Detailed setup instructions
-- **[Architecture](docs/ARCHITECTURE.md)** - System architecture overview
-- **[Routing Logic](docs/ROUTING_LOGIC.md)** - Route finding algorithms
-- **[Setup Guide](docs/SETUP.md)** - Development environment setup
-- **[API Reference](docs/API.md)** - API documentation
-- **[Database Schema](docs/SCHEMA.md)** - Database structure
-- **[Seeding Guide](SEEDING.md)** - How to populate the database
+### Prerequisites
+- Node.js 18+ and npm
+- Expo CLI (`npm install -g expo-cli`)
+- Supabase account (free tier works)
+- iOS Simulator (Mac) or Android Emulator/Device
 
-## Installation
+### Installation
 
-See [Quick Start Guide](QUICKSTART.md) for quick setup, or [MVP Setup Guide](docs/MVP_SETUP.md) for detailed instructions.
-
+1. **Clone the repository**
 ```bash
-# Install dependencies
+git clone <repository-url>
+cd nanduti
+```
+
+2. **Install dependencies**
+```bash
 npm install
+```
 
-# Set up environment variables
+3. **Set up environment variables**
+```bash
 cp .env.example .env
+```
 
-# Configure Supabase (see guides above)
+Edit `.env` with your Supabase credentials:
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+```
 
-# Start development server
+4. **Set up Supabase database**
+
+Follow the [SEEDING.md](SEEDING.md) guide to:
+- Create a new Supabase project
+- Set up the database tables (stops, lines, routes, line_polylines)
+- Run the seed script to populate with Asunción transit data
+
+5. **Start the development server**
+```bash
 npm start
 ```
 
-## Database Setup
+6. **Run on device/simulator**
 
-The transit data is stored in Supabase PostgreSQL database with the following tables:
+- **iOS**: Press `i` in the terminal or use Expo Go app
+- **Android**: Press `a` in the terminal or use Expo Go app
+- **Web**: Press `w` in the terminal
 
-- **stops** - Bus stop locations
-- **lines** - Transit line information
-- **routes** - Line-stop relationships
-- **line_polylines** - Route geometries
+## 📖 Documentation
 
-See [SEEDING.md](SEEDING.md) for database seeding instructions.
+- **[Quick Start Guide](QUICKSTART.md)** - Get up and running in 5 minutes
+- **[Setup Guide](SETUP.md)** - Detailed step-by-step instructions
+- **[Troubleshooting Guide](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[MVP Summary](MVP_SUMMARY.md)** - Implementation details
+- **[Seeding Guide](SEEDING.md)** - Database setup and data population
+- **[Project Structure](PROJECT_STRUCTURE.md)** - Code organization
 
-## Project Structure
+## 🏗 Project Structure
 
 ```
 src/
 ├── components/     # Reusable UI components
-│   ├── Map.tsx
-│   ├── SearchBar.tsx
-│   ├── StopCard.tsx
-│   ├── RouteCard.tsx
-│   ├── BottomSheet.tsx
-│   └── LoadingSpinner.tsx
+│   ├── Map.tsx              # Interactive map component
+│   ├── StopCard.tsx         # Bus stop card
+│   ├── RouteCard.tsx        # Route result card
+│   ├── BottomSheet.tsx      # Modal bottom sheet
+│   ├── LoadingSpinner.tsx    # Loading indicator
+│   └── ErrorBoundary.tsx    # Error boundary component
 ├── screens/        # Screen components
-│   ├── HomeScreen.tsx
-│   └── RouteDetailScreen.tsx
+│   ├── HomeScreen.tsx        # Main map screen
+│   └── RouteDetailScreen.tsx # Route details screen
 ├── services/       # API and external services
-│   ├── supabase.ts
-│   ├── location.ts
-│   └── routing.ts
+│   ├── supabase.ts          # Supabase client and queries
+│   ├── location.ts          # Location services
+│   └── routing.ts           # Route finding algorithm
 ├── hooks/          # Custom React hooks
-│   ├── useLocation.ts
-│   └── useRoute.ts
+│   ├── useLocation.ts       # Location tracking hook
+│   └── useRoute.ts          # Route finding hook
 ├── types/          # TypeScript type definitions
-│   └── index.ts
+│   └── index.ts             # All type definitions
 ├── utils/          # Utility functions
-│   ├── constants.ts
-│   └── distance.ts
+│   ├── constants.ts         # App constants (colors, defaults)
+│   └── distance.ts          # Distance calculations
 └── styles/         # Styling constants
 ```
 
-## Development
+## 🔧 Development
+
+### Available Scripts
 
 ```bash
-# Install dependencies
-npm install
-
 # Start development server
 npm start
 
@@ -126,98 +174,106 @@ npm run android
 # Run on iOS
 npm run ios
 
+# Run on web
+npm run web
+
 # Type checking
 npm run type-check
 ```
 
-## How It Works
+### Type Checking
 
-### User Flow
+The project uses TypeScript in strict mode. Run type checking before committing:
 
-1. **App Launch**
-   - App requests location permission
-   - Shows map centered on user's location
-   - Displays all bus stops as red markers
-   - Shows transit route lines
+```bash
+npm run type-check
+```
 
-2. **Plan Route**
-   - User taps "Planificar Ruta" button
-   - Modal opens with origin pre-filled (nearest stop)
-   - User searches for destination stop
-   - App finds available routes (direct + transfers)
+### Code Style
 
-3. **View Route**
-   - User selects a route from the list
-   - Route detail screen opens
-   - Map highlights the selected route(s)
-   - Step-by-step instructions in Spanish
+- Use TypeScript strict mode
+- Follow existing code conventions
+- Add proper null checks
+- Use React.memo for performance optimization
+- Remove console statements before committing
 
-4. **Navigate**
-   - User follows instructions
-   - Taps "Entendido" to go back
+## 🗄 Database Schema
 
-### Route Finding Algorithm
+### Tables
 
-The app finds routes using these steps:
+- **stops**: Geographic locations of bus stops (~120 stops)
+  - `id`: Primary key
+  - `name`: Stop name
+  - `latitude`, `longitude`: Coordinates
+  - `neighborhood`: Neighborhood name
+
+- **lines**: Transit line information (15 lines)
+  - `id`: Primary key
+  - `name`: Line name (e.g., "Línea 1")
+  - `color`: Hex color code for display
+  - `description`: Line description
+
+- **routes**: Junction table linking lines to stops
+  - `id`: Primary key
+  - `line_id`: Foreign key to lines
+  - `stop_id`: Foreign key to stops
+  - `order`: Stop order in the route
+
+- **line_polylines**: GeoJSON route geometries
+  - `id`: Primary key
+  - `line_id`: Foreign key to lines
+  - `geojson`: LineString geometry
+
+See [SEEDING.md](SEEDING.md) for database seeding instructions.
+
+## 🚗 Route Finding Algorithm
+
+The app finds routes using a multi-step approach:
 
 1. **Direct Routes**: Find bus lines that serve both origin and destination stops
 2. **Transfer Routes**: Find combinations of lines through intermediate stops
 3. **Ranking**: Sort routes by total time and distance
 
-See [Routing Logic](docs/ROUTING_LOGIC.md) for detailed algorithm information.
+### Route Calculations
 
-## Database
+- **Walking Speed**: 5 km/h
+- **Bus Speed**: 20 km/h
+- **Transfer Time**: 5 minutes (estimated)
+- **Search Radius**: 500 meters for nearby stops
 
-### Tables
+## 🐛 Troubleshooting
 
-- **stops**: Geographic locations of bus stops
-- **lines**: Transit line information (name, color, description)
-- **routes**: Junction table linking lines to stops in order
-- **line_polylines**: GeoJSON LineString geometries for map display
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions:
 
-### Sample Data
+- Map not showing stops
+- Location permission not working
+- Routes not found
+- App crashes
+- Connection errors
 
-- ~120 stops across Asunción neighborhoods
-- 15 bus lines (Línea 1-15)
-- Route definitions for each line
-- GeoJSON polylines for visual route display
-
-See [SEEDING.md](SEEDING.md) for seeding instructions.
-
-## Screens
-
-### Home Screen
-- Interactive map with user location and stops
-- "Planificar Ruta" FAB button
-- Stop details bottom sheet
-- Route planning modal
-- Route results list
-
-### Route Detail Screen
-- Route map with highlighted path
-- Route summary (duration, distance, type)
-- Step-by-step instructions in Spanish
-- Walking directions
-- Bus line information
-- Transfer point details (for transfer routes)
-- "Entendido" button to go back
-
-## Contributing
+## 📝 Contributing
 
 This is an MVP project. Future improvements could include:
 
-- Real-time bus tracking
-- Schedule information
-- Fare calculator
-- Favorites/saved routes
-- Multiple language support
-- Accessibility features
-- User accounts
+- [ ] Real-time bus tracking
+- [ ] Schedule information
+- [ ] Fare calculator
+- [ ] Favorites/saved routes
+- [ ] Multiple language support
+- [ ] Accessibility features
+- [ ] User accounts
+- [ ] Push notifications
+- [ ] Dark mode
 
-## License
+## 📄 License
 
-MIT
+MIT License - feel free to use this project for learning or your own transit apps!
 
-## Credits
+## 🙏 Credits
 
 Built for the Ñanduti public transit system in Asunción, Paraguay.
+
+Special thanks to:
+- Expo team for the amazing development platform
+- Supabase for the easy-to-use backend
+- React Native community for great libraries

@@ -4,3 +4,4 @@ export { StopCard } from './StopCard';
 export { RouteCard } from './RouteCard';
 export { BottomSheet } from './BottomSheet';
 export { LoadingSpinner } from './LoadingSpinner';
+export { ErrorBoundary } from './ErrorBoundary';

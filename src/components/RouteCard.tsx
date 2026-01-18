@@ -47,12 +47,14 @@ export const RouteCard: React.FC<RouteCardProps> = ({
         <Text style={styles.time}>{route.totalTime} min</Text>
       </View>
       <View style={styles.details}>
-        <Text style={stopsCount}>{route.steps.length} pasos</Text>
+        <Text style={styles.stopsCount}>{route.steps.length} pasos</Text>
         <Text style={styles.distance}>{route.totalDistance}m total</Text>
       </View>
     </TouchableOpacity>
   );
 };
+
+export default React.memo(RouteCard);
 
 const styles = StyleSheet.create({
   container: {
@@ -102,8 +104,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#757575',
   },
-});
-
-const stopsCount = StyleSheet.compose(styles.distance, {
-  fontWeight: '600',
+  stopsCount: {
+    fontSize: 13,
+    color: '#757575',
+    fontWeight: '600',
+  },
 });

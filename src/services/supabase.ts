@@ -5,7 +5,7 @@ const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('Supabase credentials not found. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
+  // Silently handle missing credentials
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
@@ -17,7 +17,6 @@ export async function fetchAllStops(): Promise<Stop[]> {
     .order('name');
 
   if (error) {
-    console.error('Error fetching stops:', error);
     throw error;
   }
 
@@ -32,7 +31,6 @@ export async function fetchStopById(id: number): Promise<Stop | null> {
     .single();
 
   if (error) {
-    console.error('Error fetching stop:', error);
     return null;
   }
 
@@ -48,7 +46,6 @@ export async function searchStops(query: string): Promise<Stop[]> {
     .limit(20);
 
   if (error) {
-    console.error('Error searching stops:', error);
     throw error;
   }
 
@@ -62,7 +59,6 @@ export async function fetchAllLines(): Promise<Line[]> {
     .order('id');
 
   if (error) {
-    console.error('Error fetching lines:', error);
     throw error;
   }
 
@@ -77,7 +73,6 @@ export async function fetchLineById(id: number): Promise<Line | null> {
     .single();
 
   if (error) {
-    console.error('Error fetching line:', error);
     return null;
   }
 
@@ -92,7 +87,6 @@ export async function fetchRoutesByLine(lineId: number): Promise<RouteStop[]> {
     .order('order');
 
   if (error) {
-    console.error('Error fetching routes:', error);
     throw error;
   }
 
@@ -107,7 +101,6 @@ export async function fetchPolylineByLine(lineId: number): Promise<LinePolyline 
     .single();
 
   if (error) {
-    console.error('Error fetching polyline:', error);
     return null;
   }
 
@@ -121,7 +114,6 @@ export async function fetchAllPolylines(): Promise<LinePolyline[]> {
     .order('line_id');
 
   if (error) {
-    console.error('Error fetching polylines:', error);
     throw error;
   }
 
@@ -135,7 +127,6 @@ export async function fetchLinesByStop(stopId: number): Promise<Line[]> {
     .eq('stop_id', stopId);
 
   if (error) {
-    console.error('Error fetching lines by stop:', error);
     throw error;
   }
 

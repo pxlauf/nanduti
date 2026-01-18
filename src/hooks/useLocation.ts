@@ -27,7 +27,6 @@ export function useLocation(): UseLocationResult {
       }
     } catch (err) {
       setError('Error al obtener ubicación');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -74,7 +73,6 @@ export function useWatchLocation(updateInterval?: number): UseWatchLocationResul
       }
     } catch (err) {
       setError('Error al obtener ubicación');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -103,7 +101,6 @@ export function useWatchLocation(updateInterval?: number): UseWatchLocationResul
       setIsWatching(true);
     } catch (err) {
       setError('Error al observar ubicación');
-      console.error(err);
       setIsWatching(false);
     }
   }, [subscription, updateInterval]);
