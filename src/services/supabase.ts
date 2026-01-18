@@ -1,67 +1,143 @@
 import { createClient } from '@supabase/supabase-js';
-import { Stop, Line, RouteStop, LinePolyline } from '@types';
+import { Stop, Line, RouteStop, LinePolyline } from '../types';
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
 
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('Supabase credentials not found. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
+}
+
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-/**
- * Fetch all stops from the database
- * @returns Array of stops
- */
-export async function fetchAllStops(): Promise<Stop[]>;
+export async function fetchAllStops(): Promise<Stop[]> {
+  const { data, error } = await supabase
+    .from('stops')
+    .select('*')
+    .order('name');
 
-/**
- * Fetch a single stop by ID
- * @param id Stop ID
- * @returns Stop or null
- */
-export async function fetchStopById(id: number): Promise<Stop | null>;
+  if (error) {
+    console.error('Error fetching stops:', error);
+    throw error;
+  }
 
-/**
- * Search stops by name
- * @param query Search query
- * @returns Array of matching stops
- */
-export async function searchStops(query: string): Promise<Stop[]>;
+  return data || [];
+}
 
-/**
- * Fetch all lines from the database
- * @returns Array of lines
- */
-export async function fetchAllLines(): Promise<Line[]>;
+export async function fetchStopById(id: number): Promise<Stop | null> {
+  const { data, error } = await supabase
+    .from('stops')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-/**
- * Fetch a single line by ID
- * @param id Line ID
- * @returns Line or null
- */
-export async function fetchLineById(id: number): Promise<Line | null>;
+  if (error) {
+    console.error('Error fetching stop:', error);
+    return null;
+  }
 
-/**
- * Fetch all routes for a line
- * @param lineId Line ID
- * @returns Array of route stops in order
- */
-export async function fetchRoutesByLine(lineId: number): Promise<RouteStop[]>;
+  return data;
+}
 
-/**
- * Fetch polyline geometry for a line
- * @param lineId Line ID
- * @returns LinePolyline or null
- */
-export async function fetchPolylineByLine(lineId: number): Promise<LinePolyline | null>;
+export async function searchStops(query: string): Promise<Stop[]> {
+  const { data, error } = await supabase
+    .from('stops')
+    .select('*')
+    .ilike('name', `%${query}%`)
+    .order('name')
+    .limit(20);
 
-/**
- * Fetch all polylines
- * @returns Array of line polylines
- */
-export async function fetchAllPolylines(): Promise<LinePolyline[]>;
+  if (error) {
+    console.error('Error searching stops:', error);
+    throw error;
+  }
 
-/**
- * Fetch lines that serve a specific stop
- * @param stopId Stop ID
- * @returns Array of lines
- */
-export async function fetchLinesByStop(stopId: number): Promise<Line[]>;
+  return data || [];
+}
+
+export async function fetchAllLines(): Promise<Line[]> {
+  const { data, error } = await supabase
+    .from('lines')
+    .select('*')
+    .order('id');
+
+  if (error) {
+    console.error('Error fetching lines:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+export async function fetchLineById(id: number): Promise<Line | null> {
+  const { data, error } = await supabase
+    .from('lines')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching line:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function fetchRoutesByLine(lineId: number): Promise<RouteStop[]> {
+  const { data, error } = await supabase
+    .from('routes')
+    .select('*, stop:stops(*)')
+    .eq('line_id', lineId)
+    .order('order');
+
+  if (error) {
+    console.error('Error fetching routes:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+export async function fetchPolylineByLine(lineId: number): Promise<LinePolyline | null> {
+  const { data, error } = await supabase
+    .from('line_polylines')
+    .select('*')
+    .eq('line_id', lineId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching polyline:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function fetchAllPolylines(): Promise<LinePolyline[]> {
+  const { data, error } = await supabase
+    .from('line_polylines')
+    .select('*')
+    .order('line_id');
+
+  if (error) {
+    console.error('Error fetching polylines:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+export async function fetchLinesByStop(stopId: number): Promise<Line[]> {
+  const { data, error } = await supabase
+    .from('routes')
+    .select('line:lines(*)')
+    .eq('stop_id', stopId);
+
+  if (error) {
+    console.error('Error fetching lines by stop:', error);
+    throw error;
+  }
+
+  return data?.map((r: any) => r.line).filter((l: any) => l) || [];
+}

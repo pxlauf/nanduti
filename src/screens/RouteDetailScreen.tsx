@@ -1,71 +1,162 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
-import { Map, RouteCard } from '@components';
-import { Stop, Line, MapRegion } from '@types';
-import { DEFAULT_LOCATION } from '@utils/constants';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { Map, RouteCard, LoadingSpinner } from '../components';
+import { TravelRoute, RootStackParamList, RouteStep } from '../types';
+import { COLORS } from '../utils/constants';
+import { fetchAllStops, fetchAllPolylines } from '../services/supabase';
+
+type RouteDetailScreenRouteProp = RouteProp<RootStackParamList, 'RouteDetail'>;
+type RouteDetailScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 interface RouteDetailScreenProps {
-  route: {
-    params: {
-      lineId: number;
-      stops: Stop[];
-    };
-  };
-  navigation: any;
+  route: RouteDetailScreenRouteProp;
+  navigation: RouteDetailScreenNavigationProp;
 }
 
-/**
- * Screen displaying detailed route information for a line
- */
 export const RouteDetailScreen: React.FC<RouteDetailScreenProps> = ({ route, navigation }) => {
-  const { lineId, stops } = route.params;
-  const [line, setLine] = React.useState<Line | null>(null);
-  const [region, setRegion] = React.useState<MapRegion>(DEFAULT_LOCATION);
+  const { route: travelRoute } = route.params;
+  const [stops, setStops] = React.useState<any[]>([]);
+  const [polylines, setPolylines] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: travelRoute.type === 'direct' ? 'Ruta Directa' : 'Ruta con Transbordo',
+      headerStyle: {
+        backgroundColor: COLORS.primary,
+      },
+      headerTintColor: '#FFFFFF',
+      headerTitleStyle: {
+        fontWeight: '700',
+      },
+    });
+  }, [navigation, travelRoute]);
 
   React.useEffect(() => {
-    navigation.setOptions({ title: line?.name || 'Route Details' });
-  }, [line, navigation]);
+    loadData();
+  }, []);
 
-  const renderStop = ({ item, index }: { item: Stop; index: number }) => (
-    <View style={styles.stopRow}>
-      <View style={styles.stopIndexContainer}>
-        <Text style={styles.stopIndex}>{index + 1}</Text>
+  const loadData = async () => {
+    try {
+      const [stopsData, polylinesData] = await Promise.all([
+        fetchAllStops(),
+        fetchAllPolylines(),
+      ]);
+
+      setStops(stopsData);
+      setPolylines(polylinesData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStepIcon = (step: RouteStep) => {
+    switch (step.type) {
+      case 'walk':
+        return '🚶';
+      case 'bus':
+        return '🚌';
+      case 'transfer':
+        return '🔄';
+      default:
+        return '📍';
+    }
+  };
+
+  const getStepColor = (step: RouteStep) => {
+    switch (step.type) {
+      case 'walk':
+        return '#757575';
+      case 'bus':
+        return step.line?.color || COLORS.primary;
+      case 'transfer':
+        return COLORS.secondary;
+      default:
+        return COLORS.text;
+    }
+  };
+
+  const renderStep = ({ item, index }: { item: RouteStep; index: number }) => (
+    <View style={styles.stepContainer}>
+      <View style={[styles.stepIcon, { backgroundColor: getStepColor(item) }]}>
+        <Text style={styles.stepIconText}>{getStepIcon(item)}</Text>
       </View>
-      <View style={styles.stopInfo}>
-        <Text style={styles.stopName}>{item.name}</Text>
-        {item.neighborhood && (
-          <Text style={styles.stopNeighborhood}>{item.neighborhood}</Text>
+      <View style={styles.stepContent}>
+        <Text style={styles.stepInstruction}>{item.instruction}</Text>
+        {(item.duration !== undefined || item.distance !== undefined) && (
+          <View style={styles.stepDetails}>
+            {item.duration !== undefined && (
+              <Text style={styles.stepDetailText}>{item.duration} min</Text>
+            )}
+            {item.distance !== undefined && item.distance > 0 && (
+              <Text style={styles.stepDetailText}>{item.distance}m</Text>
+            )}
+          </View>
         )}
       </View>
+      {index < travelRoute.steps.length - 1 && (
+        <View style={[styles.stepConnector, { backgroundColor: getStepColor(item) }]} />
+      )}
     </View>
   );
 
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <View style={styles.container}>
+      {/* Map */}
       <View style={styles.mapContainer}>
         <Map
-          region={region}
           stops={stops}
-          onRegionChange={setRegion}
+          polylines={polylines}
+          route={travelRoute}
         />
       </View>
-      <View style={styles.infoContainer}>
-        {line && (
-          <View style={styles.lineHeader}>
-            <View style={[styles.lineBadge, { backgroundColor: line.color }]}>
-              <Text style={styles.lineName}>{line.name}</Text>
-            </View>
+
+      {/* Route Summary */}
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryRow}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Duración</Text>
+            <Text style={styles.summaryValue}>{travelRoute.totalTime} min</Text>
           </View>
-        )}
-        <View style={styles.stopsHeader}>
-          <Text style={styles.stopsTitle}>Stops ({stops.length})</Text>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Distancia</Text>
+            <Text style={styles.summaryValue}>{travelRoute.totalDistance}m</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Tipo</Text>
+            <Text style={[styles.summaryValue, { color: COLORS.primary }]}>
+              {travelRoute.type === 'direct' ? 'Directo' : 'Transbordo'}
+            </Text>
+          </View>
         </View>
+      </View>
+
+      {/* Route Steps */}
+      <View style={styles.stepsContainer}>
+        <Text style={styles.stepsTitle}>Instrucciones</Text>
         <FlatList
-          data={stops}
-          renderItem={renderStop}
-          keyExtractor={(item) => item.id.toString()}
-          style={styles.stopsList}
-          contentContainerStyle={styles.stopsListContent}
+          data={travelRoute.steps}
+          renderItem={renderStep}
+          keyExtractor={(item, index) => `step-${index}`}
+          contentContainerStyle={styles.stepsList}
+          ListFooterComponent={
+            <TouchableOpacity
+              style={styles.understoodButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.understoodButtonText}>Entendido</Text>
+            </TouchableOpacity>
+          }
         />
       </View>
     </View>
@@ -80,72 +171,102 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: '40%',
   },
-  infoContainer: {
-    flex: 1,
-  },
-  lineHeader: {
+  summaryContainer: {
     padding: 16,
-    alignItems: 'center',
-  },
-  lineBadge: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  lineName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  stopsHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: '#F5F5F5',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
-  stopsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: '#757575',
+    marginBottom: 4,
+  },
+  summaryValue: {
+    fontSize: 18,
+    fontWeight: '700',
     color: '#212121',
   },
-  stopsList: {
+  summaryDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#E0E0E0',
+  },
+  stepsContainer: {
     flex: 1,
   },
-  stopsListContent: {
-    paddingVertical: 8,
-  },
-  stopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+  stepsTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#212121',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: '#E0E0E0',
   },
-  stopIndexContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#E0E0E0',
+  stepsList: {
+    padding: 16,
+  },
+  stepContainer: {
+    flexDirection: 'row',
+    marginBottom: 24,
+  },
+  stepIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
-  stopIndex: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#212121',
+  stepIconText: {
+    fontSize: 20,
   },
-  stopInfo: {
+  stepContent: {
     flex: 1,
+    paddingVertical: 8,
   },
-  stopName: {
+  stepInstruction: {
     fontSize: 15,
     fontWeight: '500',
     color: '#212121',
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  stopNeighborhood: {
+  stepDetails: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  stepDetailText: {
     fontSize: 13,
     color: '#757575',
+  },
+  stepConnector: {
+    position: 'absolute',
+    left: 20,
+    top: 40,
+    bottom: -24,
+    width: 2,
+  },
+  understoodButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  understoodButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

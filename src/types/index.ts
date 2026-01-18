@@ -23,7 +23,10 @@ export interface Route {
 export interface LinePolyline {
   id: number;
   line_id: number;
-  geojson: GeoJSON.LineString;
+  geojson: {
+    type: 'LineString';
+    coordinates: [number, number][];
+  };
 }
 
 export interface RouteStop extends Route {
@@ -44,6 +47,33 @@ export interface RouteSuggestion {
   stops: Stop[];
   distance: number;
   estimatedTime?: number;
+  type: 'direct' | 'transfer';
+  transferStop?: Stop;
+  firstLine?: Line;
+  secondLine?: Line;
+}
+
+export interface RouteStep {
+  type: 'walk' | 'bus' | 'transfer';
+  instruction: string;
+  distance?: number;
+  line?: Line;
+  duration?: number;
+  stop?: Stop;
+}
+
+export interface TravelRoute {
+  id: string;
+  type: 'direct' | 'transfer';
+  origin: Stop | Location;
+  destination: Stop;
+  steps: RouteStep[];
+  totalDistance: number;
+  totalTime: number;
+  line?: Line;
+  firstLine?: Line;
+  secondLine?: Line;
+  transferStop?: Stop;
 }
 
 export type MapRegion = {
@@ -53,9 +83,9 @@ export type MapRegion = {
   longitudeDelta: number;
 };
 
-export type NavigationParams = {
-  RouteDetail?: {
-    lineId: number;
-    stops: Stop[];
+export type RootStackParamList = {
+  Home: undefined;
+  RouteDetail: {
+    route: TravelRoute;
   };
 };

@@ -1,53 +1,84 @@
 import * as Location from 'expo-location';
-import { Location as LocationType } from '@types';
+import { Location as LocationType } from '../types';
 
-/**
- * Request location permissions
- * @returns True if permission granted, false otherwise
- */
-export async function requestLocationPermission(): Promise<boolean>;
+export async function requestLocationPermission(): Promise<boolean> {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    return status === 'granted';
+  } catch (error) {
+    console.error('Error requesting location permission:', error);
+    return false;
+  }
+}
 
-/**
- * Get current device location
- * @returns Current location or null
- */
-export async function getCurrentLocation(): Promise<LocationType | null>;
+export async function getCurrentLocation(): Promise<LocationType | null> {
+  try {
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      console.warn('Location permission not granted');
+      return null;
+    }
 
-/**
- * Subscribe to location updates
- * @param callback Callback function for location updates
- * @returns Subscription object
- */
-export function watchLocation(
-  callback: (location: LocationType) => void
-): Location.LocationSubscription;
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
 
-/**
- * Check if location services are enabled
- * @returns True if enabled, false otherwise
- */
-export async function isLocationEnabled(): Promise<boolean>;
+    return {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+  } catch (error) {
+    console.error('Error getting current location:', error);
+    return null;
+  }
+}
 
-/**
- * Get the last known location
- * @returns Last known location or null
- */
-export async function getLastKnownLocation(): Promise<LocationType | null>;
+export async function watchLocation(
+  callback: (location: LocationType) => void,
+  options?: {
+    distanceInterval?: number;
+    timeInterval?: number;
+  }
+): Promise<Location.LocationSubscription | null> {
+  try {
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      console.warn('Location permission not granted');
+      return null;
+    }
 
-/**
- * Reverse geocode coordinates to address
- * @param latitude Latitude
- * @param longitude Longitude
- * @returns Address string or null
- */
-export async function reverseGeocode(
-  latitude: number,
-  longitude: number
-): Promise<string | null>;
+    return await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        distanceInterval: options?.distanceInterval || 10,
+        timeInterval: options?.timeInterval || 5000,
+      },
+      (location) => {
+        callback({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      }
+    );
+  } catch (error) {
+    console.error('Error watching location:', error);
+    return null;
+  }
+}
 
-/**
- * Geocode address to coordinates
- * @param address Address string
- * @returns Location or null
- */
-export async function geocode(address: string): Promise<LocationType | null>;
+export async function getLastKnownLocation(): Promise<LocationType | null> {
+  try {
+    const location = await Location.getLastKnownPositionAsync();
+    if (!location) {
+      return null;
+    }
+
+    return {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+  } catch (error) {
+    console.error('Error getting last known location:', error);
+    return null;
+  }
+}

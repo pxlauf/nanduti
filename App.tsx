@@ -1,64 +1,44 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { HomeScreen, RouteDetailScreen } from '@screens';
-import { Stop, MapRegion } from '@types';
+import { HomeScreen, RouteDetailScreen } from './src/screens';
+import { RootStackParamList } from './src/types';
 
-const Tab = createBottomTabNavigator();
-
-type RootStackParamList = {
-  MainTabs: undefined;
-  RouteDetail: {
-    lineId: number;
-    stops: Stop[];
-  };
-};
-
-type RouteDetailScreenRouteProp = {
-  params: {
-    lineId: number;
-    stops: Stop[];
-  };
-};
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
     <>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <Tab.Navigator
+        <Stack.Navigator
+          initialRouteName="Home"
           screenOptions={{
-            headerShown: false,
+            headerShown: true,
           }}
         >
-          <Tab.Screen
-            name="MainTabs"
-            component={MainTabs}
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
             options={{
-              tabBarLabel: 'Map',
+              title: 'Ñanduti',
+              headerStyle: {
+                backgroundColor: '#2E7D32',
+              },
+              headerTintColor: '#FFFFFF',
+              headerTitleStyle: {
+                fontWeight: '700',
+                fontSize: 20,
+              },
             }}
           />
-        </Tab.Navigator>
+          <Stack.Screen
+            name="RouteDetail"
+            component={RouteDetailScreen}
+          />
+        </Stack.Navigator>
       </NavigationContainer>
     </>
-  );
-}
-
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: 'Map',
-        }}
-      />
-    </Tab.Navigator>
   );
 }
