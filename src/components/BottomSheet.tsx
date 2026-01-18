@@ -1,11 +1,8 @@
-import React, { useRef, useCallback } from 'react';
-import { View, StyleSheet } from 'react-native';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import React from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface BottomSheetProps {
   children: React.ReactNode;
-  snapPoints?: (string | number)[];
   onClose?: () => void;
 }
 
@@ -14,49 +11,46 @@ interface BottomSheetProps {
  */
 export const BottomSheet: React.FC<BottomSheetProps> = ({
   children,
-  snapPoints = ['25%', '50%', '90%'],
   onClose,
 }) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      onClose?.();
-    }
-  }, [onClose]);
-
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-        handleComponent={Handle}
-        enablePanDownToClose={true}
-        backgroundStyle={styles.background}
-      >
-        <BottomSheetView style={styles.content}>{children}</BottomSheetView>
-      </BottomSheet>
-    </GestureHandlerRootView>
-  );
-};
-
-const Handle = () => {
-  return (
-    <View style={styles.handleContainer}>
-      <View style={styles.handle} />
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={onClose}
+      />
+      <View style={styles.content}>
+        <View style={styles.handleContainer}>
+          <View style={styles.handle} />
+        </View>
+        {children}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  background: {
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  content: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    paddingBottom: 20,
   },
   handleContainer: {
     alignItems: 'center',
@@ -67,8 +61,5 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#E0E0E0',
     borderRadius: 2,
-  },
-  content: {
-    flex: 1,
   },
 });

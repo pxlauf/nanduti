@@ -1,25 +1,25 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import MapView, { Marker, Polyline, Region, LatLng } from 'react-native-maps';
-import { Stop, LinePolyline } from '@types';
+import MapView, { Marker, Polyline, Region, LatLng, Marker as MapMarker } from 'react-native-maps';
+import { Stop, LinePolyline, TravelRoute } from '../types';
+import { COLORS } from '../utils/constants';
 
 interface MapProps {
   region?: Region;
   stops?: Stop[];
   polylines?: LinePolyline[];
+  route?: TravelRoute;
   onRegionChange?: (region: Region) => void;
   onMarkerPress?: (stop: Stop) => void;
   showUserLocation?: boolean;
   userLocation?: LatLng;
 }
 
-/**
- * MapView component wrapper for displaying transit map
- */
 export const Map: React.FC<MapProps> = ({
   region,
   stops = [],
   polylines = [],
+  route,
   onRegionChange,
   onMarkerPress,
   showUserLocation = false,
@@ -34,9 +34,16 @@ export const Map: React.FC<MapProps> = ({
         showsUserLocation={showUserLocation}
         followsUserLocation={showUserLocation}
       >
+        {/* User location marker */}
         {userLocation && (
-          <Marker coordinate={userLocation} identifier="userLocation" />
+          <Marker
+            coordinate={userLocation}
+            identifier="userLocation"
+            pinColor={COLORS.primary}
+          />
         )}
+
+        {/* Stop markers */}
         {stops.map((stop) => (
           <Marker
             key={stop.id}
@@ -46,17 +53,72 @@ export const Map: React.FC<MapProps> = ({
             }}
             identifier={`stop-${stop.id}`}
             onPress={() => onMarkerPress?.(stop)}
+            pinColor="red"
           />
         ))}
-        {polylines.map((polyline) => (
+
+        {/* Route polylines */}
+        {route && route.line && (
+          <>
+            {polylines
+              .filter(p => p.line_id === route.line!.id)
+              .map((polyline) => (
+                <Polyline
+                  key={polyline.id}
+                  coordinates={polyline.geojson.coordinates.map((coord: [number, number]) => ({
+                    latitude: coord[1],
+                    longitude: coord[0],
+                  }))}
+                  strokeColor={route.line!.color}
+                  strokeWidth={4}
+                />
+              ))}
+          </>
+        )}
+
+        {/* Transfer route polylines */}
+        {route && route.type === 'transfer' && route.firstLine && route.secondLine && (
+          <>
+            {polylines
+              .filter(p => p.line_id === route.firstLine!.id)
+              .map((polyline) => (
+                <Polyline
+                  key={`first-${polyline.id}`}
+                  coordinates={polyline.geojson.coordinates.map((coord: [number, number]) => ({
+                    latitude: coord[1],
+                    longitude: coord[0],
+                  }))}
+                  strokeColor={route.firstLine!.color}
+                  strokeWidth={4}
+                />
+              ))}
+            {polylines
+              .filter(p => p.line_id === route.secondLine!.id)
+              .map((polyline) => (
+                <Polyline
+                  key={`second-${polyline.id}`}
+                  coordinates={polyline.geojson.coordinates.map((coord: [number, number]) => ({
+                    latitude: coord[1],
+                    longitude: coord[0],
+                  }))}
+                  strokeColor={route.secondLine!.color}
+                  strokeWidth={4}
+                />
+              ))}
+          </>
+        )}
+
+        {/* All line polylines (when no route selected) */}
+        {!route && polylines.map((polyline) => (
           <Polyline
             key={polyline.id}
-            coordinates={polyline.geojson.coordinates.map(coord => ({
+            coordinates={polyline.geojson.coordinates.map((coord: [number, number]) => ({
               latitude: coord[1],
               longitude: coord[0],
             }))}
-            strokeColor="#000"
+            strokeColor="#999999"
             strokeWidth={2}
+            lineDashPattern={[5, 5]}
           />
         ))}
       </MapView>
