@@ -126,6 +126,8 @@ export const Map: React.FC<MapProps> = ({
   );
 };
 
+export default React.memo(Map);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

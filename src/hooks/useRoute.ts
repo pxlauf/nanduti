@@ -32,7 +32,6 @@ export function useRoute(): UseRoutesResult {
       }
     } catch (err) {
       setError('Error al buscar rutas');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -80,7 +79,6 @@ export function useNearbyStops(): UseNearbyStopsResult {
       setStops(nearby.map(s => ({ id: s.id, name: s.name, latitude: s.latitude, longitude: s.longitude, neighborhood: s.neighborhood })));
     } catch (err) {
       setError('Error al buscar paradas cercanas');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -135,7 +133,6 @@ export function useLineDetail(lineId?: number): UseLineDetailResult {
       }));
     } catch (err) {
       setError('Error al cargar línea');
-      console.error(err);
     } finally {
       setLoading(false);
     }

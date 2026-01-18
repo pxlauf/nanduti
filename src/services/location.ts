@@ -6,7 +6,6 @@ export async function requestLocationPermission(): Promise<boolean> {
     const { status } = await Location.requestForegroundPermissionsAsync();
     return status === 'granted';
   } catch (error) {
-    console.error('Error requesting location permission:', error);
     return false;
   }
 }
@@ -15,7 +14,6 @@ export async function getCurrentLocation(): Promise<LocationType | null> {
   try {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
-      console.warn('Location permission not granted');
       return null;
     }
 
@@ -28,7 +26,6 @@ export async function getCurrentLocation(): Promise<LocationType | null> {
       longitude: location.coords.longitude,
     };
   } catch (error) {
-    console.error('Error getting current location:', error);
     return null;
   }
 }
@@ -43,7 +40,6 @@ export async function watchLocation(
   try {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
-      console.warn('Location permission not granted');
       return null;
     }
 
@@ -61,7 +57,6 @@ export async function watchLocation(
       }
     );
   } catch (error) {
-    console.error('Error watching location:', error);
     return null;
   }
 }
@@ -78,7 +73,6 @@ export async function getLastKnownLocation(): Promise<LocationType | null> {
       longitude: location.coords.longitude,
     };
   } catch (error) {
-    console.error('Error getting last known location:', error);
     return null;
   }
 }

@@ -35,6 +35,8 @@ export const StopCard: React.FC<StopCardProps> = ({
   );
 };
 
+export default React.memo(StopCard);
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',

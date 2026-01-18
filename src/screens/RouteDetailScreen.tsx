@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Platform } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { Map, RouteCard, LoadingSpinner } from '../components';
@@ -20,6 +21,12 @@ export const RouteDetailScreen: React.FC<RouteDetailScreenProps> = ({ route, nav
   const [stops, setStops] = React.useState<any[]>([]);
   const [polylines, setPolylines] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
+
+  const triggerHaptic = () => {
+    if (Platform.OS === 'ios') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,7 +55,7 @@ export const RouteDetailScreen: React.FC<RouteDetailScreenProps> = ({ route, nav
       setStops(stopsData);
       setPolylines(polylinesData);
     } catch (error) {
-      console.error('Error loading data:', error);
+      // Silently handle loading errors
     } finally {
       setLoading(false);
     }
@@ -152,7 +159,10 @@ export const RouteDetailScreen: React.FC<RouteDetailScreenProps> = ({ route, nav
           ListFooterComponent={
             <TouchableOpacity
               style={styles.understoodButton}
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                triggerHaptic();
+                navigation.goBack();
+              }}
             >
               <Text style={styles.understoodButtonText}>Entendido</Text>
             </TouchableOpacity>

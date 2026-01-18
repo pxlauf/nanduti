@@ -76,11 +76,11 @@ async function findDirectRoutes(
         }
       }
     }
-  } catch (error) {
-    console.error('Error finding direct routes:', error);
-  }
+    } catch (error) {
+    // Silently handle direct route errors
+    }
 
-  return routes;
+    return routes;
 }
 
 async function createDirectRoute(
@@ -163,7 +163,7 @@ async function createDirectRoute(
       line,
     };
   } catch (error) {
-    console.error('Error creating direct route:', error);
+    // Silently handle direct route creation errors
     return null;
   }
 }
@@ -211,7 +211,7 @@ async function findTransferRoutes(
       }
     }
   } catch (error) {
-    console.error('Error finding transfer routes:', error);
+    // Silently handle transfer route errors
   }
 
   return routes;
@@ -323,7 +323,7 @@ async function createTransferRoute(
       transferStop,
     };
   } catch (error) {
-    console.error('Error creating transfer route:', error);
+    // Silently handle transfer route creation errors
     return null;
   }
 }
