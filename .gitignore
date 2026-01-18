@@ -41,3 +41,23 @@ coverage/
 
 # Supabase
 .supabase/
+
+# Expo
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# macOS
+.expo-shared/
+
+# TSLint
+.tslint.json
+
+# Temporary files
+.expo/
