@@ -344,6 +344,23 @@ Once the app is running:
    - Select a route from the results
    - View route details and steps
 
+## Known Warnings
+
+### VS Code Schema Store Warning
+
+**Warning**: VS Code may show a notification about "Downloading schemas from the internet". This is a normal feature of VS Code that helps with IntelliSense and autocompletion for configuration files.
+
+**Why it happens**: VS Code downloads JSON schemas for various configuration files (including `tsconfig.json`, `package.json`, etc.) from the internet to provide better IntelliSense.
+
+**Is it safe?**: Yes, these come from official schema repositories (SchemaStore.org) and are used by most developers globally.
+
+**Can I turn it off?**: If you prefer not to download schemas:
+1. Open VS Code Settings
+2. Search for "json schema"
+3. Disable or configure under `JSON > Schemas: Download` settings
+
+**Recommendation**: Leave it enabled for better development experience with autocompletion and error detection in configuration files.
+
 ## Troubleshooting
 
 ### Common Issues
@@ -426,6 +443,21 @@ Once the app is running:
 2. Verify Supabase project is active
 3. Check Supabase status page: [status.supabase.com](https://status.supabase.com)
 4. Ensure firewall is not blocking connections
+
+#### "File 'expo/tsconfig.base' not found"
+
+**Symptoms**: TypeScript error about missing expo/tsconfig.base
+
+**Cause**: The tsconfig.json file references a base configuration that may not be available in all Expo/TypeScript setups.
+
+**Solution**:
+- The issue has been resolved by using a standalone TypeScript configuration without extending from expo/tsconfig.base.
+- The current tsconfig.json includes proper TypeScript settings for React Native/Expo development:
+  - ES2020 target, ESNext modules
+  - React Native JSX
+  - Strict mode enabled
+  - Path aliases configured (@/* → src/*)
+- Run `npm run type-check` to verify the configuration works correctly.
 
 ### Getting Help
 
